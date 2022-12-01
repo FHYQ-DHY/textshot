@@ -3,6 +3,7 @@
 
 import argparse
 import sys
+import os
 
 import pyperclip
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -12,6 +13,7 @@ from logger import log_copied, log_ocr_failure
 from notifications import notify_copied, notify_ocr_failure
 from ocr import ensure_tesseract_installed, get_ocr_result
 
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = r"./venv/Lib/site-packages/PyQt5/Qt5/plugins/"
 
 class Snipper(QtWidgets.QWidget):
     def __init__(self, parent, langs=None, flags=Qt.WindowFlags()):
@@ -103,11 +105,12 @@ class OneTimeSnipper(Snipper):
         if ocr_result:
             pyperclip.copy(ocr_result)
             log_copied(ocr_result)
+            # print(111)
             notify_copied(ocr_result)
         else:
             notify_ocr_failure()
-
-        QtWidgets.QApplication.quit()
+        sys.exit()
+        # QtWidgets.QApplication.quit()
 
 
 class IntervalSnipper(Snipper):
@@ -150,6 +153,8 @@ class IntervalSnipper(Snipper):
         else:
             pyperclip.copy(ocr_result)
             log_copied(ocr_result)
+            
+        # sys.exit()
 
 
 arg_parser = argparse.ArgumentParser(description=__doc__)
@@ -177,9 +182,11 @@ def take_textshot(langs, interval):
     window = QtWidgets.QMainWindow()
     if interval != None:
         snipper = IntervalSnipper(window, interval, langs)
+        # print(111)
         snipper.show()
     else:
         snipper = OneTimeSnipper(window, langs)
+        # print(222)
         snipper.show()
 
     sys.exit(app.exec_())
